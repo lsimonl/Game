@@ -23,14 +23,15 @@ public class Grab_controller : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+     
     }
 
     // Update is called once per frame
     void Update()
     {
         Pick_Throw();
+     }
 
-    }
 
      void OnDrawGizmos()
     {
@@ -38,7 +39,19 @@ public class Grab_controller : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + Vector3.right * transform.localScale.x * distance);
     }
 
-    void Pick_Throw()
+    void oldHoldingPoint()
+    {
+        if (rb.transform.localScale.x > 0)
+        {
+            holdPoint.position = new Vector3(rb.position.x + 0.7f, rb.position.y - 0.5f, 0);
+        }
+        else if (rb.transform.localScale.x < 0)
+        {
+            holdPoint.position = new Vector3(rb.position.x - 0.7f, rb.position.y - 0.5f, 0);
+        }
+    }
+
+    public void Pick_Throw()
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -77,12 +90,28 @@ public class Grab_controller : MonoBehaviour
                 hit.collider.gameObject.transform.localScale = new Vector3(direction/20, hit.collider.gameObject.transform.localScale.y, hit.collider.gameObject.transform.localScale.z);
             }
 
+            //射击与后坐力
             if (Input.GetMouseButton(0) && Time.time > nextFire)
             {
                 nextFire = Time.time + fireRate;
-                fire();
+                if (rb.transform.localScale.x > 0)
+                {
+                   
+                    holdPoint.position = new Vector3(rb.position.x + 0.5f, rb.position.y - 0.5f, 0);
+                }
+                else if (rb.transform.localScale.x < 0)
+                {
+                   
+                    holdPoint.position = new Vector3(rb.position.x- 0.5f, rb.position.y - 0.5f, 0);
+                }
+
+                fire();               
                 Audio_Control.PlaySound("GunShot4");
             }
+            else if (!Input.GetMouseButton(0)) {
+                oldHoldingPoint();
+            }
+            
         }
     }
     
@@ -101,4 +130,6 @@ public class Grab_controller : MonoBehaviour
             Instantiate(bulletLeft, bulletPos, Quaternion.identity);
         }
     }
+
+
 }
